@@ -11,11 +11,12 @@
           filled
           placeholder="Type a valid link here"
           prepend-inner-icon="mdi-earth"
+          @keyup="saveText"
+          @keyup.enter="requestData()"
         ></v-text-field>
         <div class="text-end">
           <v-btn
             @click="requestData()"
-            @keyup.enter="requestData()"
             :loading="loadingData"
             color="primary"
             class="mx-auto"
@@ -102,7 +103,15 @@ export default {
     dialog: false,
     type: "Card",
   }),
+  created() {
+    if (localStorage.getItem("url")) {
+      this.url = localStorage.getItem("url");
+    }
+  },
   methods: {
+    saveText() {
+      localStorage.setItem("url", this.url);
+    },
     // funtion for requesting data using fetch API
     async requestData() {
       if (this.url == "" || !this.url.includes("http")) {
@@ -110,6 +119,7 @@ export default {
         this.dialog = true;
         return;
       }
+      localStorage.setItem("url", this.url);
       this.loadingData = true;
       await fetch(this.url)
         .then((response) => {
