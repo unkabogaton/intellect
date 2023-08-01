@@ -4,7 +4,7 @@
       <div class="text-h1 text-center">
         <span class="font-weight-bold">API</span> REQUEST
       </div>
-      <v-card class="pa-7 ma-7">
+      <v-card class="pa-7 ma-7" elevation="10">
         <v-text-field
           v-model.trim="url"
           rounded
@@ -22,28 +22,49 @@
             >Request</v-btn
           >
         </div>
-
-        <v-dialog v-model="dialog" width="600">
-          <v-card>
-            <v-card-title class="headline grey lighten-2"
-              >Error Occured</v-card-title
-            >
-            <div class="pa-5">
-              <p class="font-weight-light">
-                {{ promptText }}
-              </p>
-              <v-divider></v-divider>
-            </div>
-            <v-card-actions class="px-5 pb-5">
-              <v-spacer></v-spacer>
-              <v-btn color="grey" text @click="dialog = false"> Ok </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
       </v-card>
-
-      <div>{{ responseData }}</div>
+      <br />
+      <div v-if="loadingData == true" class="text-center">
+        <br />
+        <br />
+        <v-progress-circular
+          class="mt-6"
+          :size="70"
+          :width="7"
+          indeterminate
+          color="primary"
+        ></v-progress-circular>
+      </div>
+      <v-card
+        v-else
+        v-for="(response, id) in responseData"
+        :key="id"
+        class="pa-4 ma-2 my-6"
+      >
+        <div v-for="(value, key) in response" :key="key">
+          <span class="font-weight-medium">{{ key }}</span
+          >: {{ value }}
+        </div>
+      </v-card>
     </div>
+    <!-- dialog box -->
+    <v-dialog v-model="dialog" width="600">
+      <v-card>
+        <v-card-title class="headline grey lighten-2"
+          >Error Occured</v-card-title
+        >
+        <div class="pa-5">
+          <p class="font-weight-light">
+            {{ promptText }}
+          </p>
+          <v-divider></v-divider>
+        </div>
+        <v-card-actions class="px-5 pb-5">
+          <v-spacer></v-spacer>
+          <v-btn color="grey" text @click="dialog = false"> Ok </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -56,7 +77,7 @@ export default {
     loadingData: false,
     count: 0,
     promptText: "",
-    dialog: true,
+    dialog: false,
   }),
   methods: {
     // funtion for requesting data using fetch API
@@ -86,8 +107,7 @@ export default {
           }
         })
         .catch((err) => {
-          this.promptText = err;
-          this.dialog = true;
+          console.log(err);
         });
       this.loadingData = false;
     },
@@ -129,7 +149,9 @@ export default {
     reverseString(array) {
       let reversedStrings = [];
       for (let item in array) {
-        if (typeof array[item] == "string") {
+        if (array[item] == "" || array[item] == null) {
+          reversedStrings.push(array[item]);
+        } else if (typeof array[item] == "string") {
           reversedStrings.push(array[item].split("").reverse().join(""));
         } else if (Array.isArray(array[item])) {
           reversedStrings.push(this.reverseInnerArray(array[item]));
