@@ -1,5 +1,8 @@
 # project-exam
 
+## Framework
+VueJS
+
 ## Project setup
 ```
 yarn install
