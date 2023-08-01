@@ -1,8 +1,47 @@
 <template>
   <v-container>
-    <div>
-      <v-text-field v-model.trim="url"></v-text-field>
-      <v-btn @click="requestData()" :loading="loadingData">Request</v-btn>
+    <div class="mt-15">
+      <div class="text-h1 text-center">
+        <span class="font-weight-bold">API</span> REQUEST
+      </div>
+      <v-card class="pa-7 ma-7">
+        <v-text-field
+          v-model.trim="url"
+          rounded
+          filled
+          placeholder="Type a valid link here"
+          prepend-inner-icon="mdi-earth"
+        ></v-text-field>
+        <div class="text-end">
+          <v-btn
+            @click="requestData()"
+            @keyup.enter="requestData()"
+            :loading="loadingData"
+            color="primary"
+            class="mx-auto"
+            >Request</v-btn
+          >
+        </div>
+
+        <v-dialog v-model="dialog" width="600">
+          <v-card>
+            <v-card-title class="headline grey lighten-2"
+              >Error Occured</v-card-title
+            >
+            <div class="pa-5">
+              <p class="font-weight-light">
+                {{ promptText }}
+              </p>
+              <v-divider></v-divider>
+            </div>
+            <v-card-actions class="px-5 pb-5">
+              <v-spacer></v-spacer>
+              <v-btn color="grey" text @click="dialog = false"> Ok </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-card>
+
       <div>{{ responseData }}</div>
     </div>
   </v-container>
@@ -16,19 +55,23 @@ export default {
     responseData: [],
     loadingData: false,
     count: 0,
+    promptText: "",
+    dialog: true,
   }),
   methods: {
     // funtion for requesting data using fetch API
     async requestData() {
       if (this.url == "" || !this.url.includes("http")) {
-        alert("Please type a valid url");
+        this.promptText = "Please type a valid url. Include http or https.";
+        this.dialog = true;
         return;
       }
       this.loadingData = true;
       await fetch(this.url)
         .then((response) => {
           if (response.status != 200) {
-            alert("Not Found");
+            this.promptText = "URL not found! No data was fetched.";
+            this.dialog = true;
             return;
           }
           return response.json();
@@ -43,7 +86,8 @@ export default {
           }
         })
         .catch((err) => {
-          console.log(err);
+          this.promptText = err;
+          this.dialog = true;
         });
       this.loadingData = false;
     },
