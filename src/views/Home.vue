@@ -23,7 +23,6 @@
           >
         </div>
       </v-card>
-      <br />
       <div v-if="loadingData == true" class="text-center">
         <br />
         <br />
@@ -35,17 +34,40 @@
           color="primary"
         ></v-progress-circular>
       </div>
-      <v-card
-        v-else
-        v-for="(response, id) in responseData"
-        :key="id"
-        class="pa-4 ma-2 my-6"
-      >
-        <div v-for="(value, key) in response" :key="key">
-          <span class="font-weight-medium">{{ key }}</span
-          >: {{ value }}
+      <div v-else>
+        <v-col
+          class="text-center mt-n8 ml-auto mr-2 mt-md-0 ml-md-0 mr-md-0"
+          md="2"
+          cols="4"
+          v-show="responseData.length != 0"
+        >
+          <div class="caption">View</div>
+          <v-select
+            v-model="type"
+            dense
+            :items="['Card', 'Raw']"
+            rounded
+            filled
+          >
+          </v-select
+        ></v-col>
+        <div v-if="type == 'Card'">
+          <v-card
+            v-for="(response, id) in responseData"
+            :key="id"
+            class="pa-6 ma-2 my-6"
+          >
+            <v-chip class="my-2">Count of E/e: response.countE</v-chip>
+            <div v-for="(value, key) in response" :key="key">
+              <span class="font-weight-medium">{{ key }}</span
+              >: {{ value }}
+            </div>
+          </v-card>
         </div>
-      </v-card>
+        <v-card class="pa-7" v-else>
+          <div>{{ responseData }}</div>
+        </v-card>
+      </div>
     </div>
     <!-- dialog box -->
     <v-dialog v-model="dialog" width="600">
@@ -78,6 +100,7 @@ export default {
     count: 0,
     promptText: "",
     dialog: false,
+    type: "Card",
   }),
   methods: {
     // funtion for requesting data using fetch API
